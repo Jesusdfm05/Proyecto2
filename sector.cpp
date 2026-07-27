@@ -38,5 +38,5 @@ void Sector::guardarEnArchivo(ofstream& archivo) const {
 }
 
 void Sector::mostrarInformacion() const {
-    cout << "ID Sector: " << id << " | Dirección: " << direccion << endl;
+    cout << "ID Sector: " << id << " | Direccion: " << direccion << endl;
 }
