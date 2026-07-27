@@ -86,6 +86,67 @@ void SistemaDelivery::guardarTodo() {
     guardarSectores();
 }
 
+// --- MÉTODOS DE REGISTRO (AUTÓNOMOS Y CORREGIDOS) ---
+void SistemaDelivery::agregarCliente() {
+    if (contadorClientes >= MAX_CLIENTES) {
+        cout << "[ERROR] Limite de clientes alcanzado.\n";
+        return;
+    }
+    
+    char cedula[10];
+    char telefono[15];
+    char nombre[30];
+    
+    cout << "\n--- REGISTRAR CLIENTE ---\n";
+    cout << "Cedula: "; cin >> cedula;
+    cin.ignore(); // Limpiar el buffer de entrada
+    cout << "Telefono: "; cin.getline(telefono, 15);
+    cout << "Nombre: "; cin.getline(nombre, 30);
+
+    listaClientes[contadorClientes] = Cliente(cedula, telefono, nombre);
+    contadorClientes++;
+    cout << "[OK] Cliente registrado exitosamente.\n";
+}
+
+void SistemaDelivery::agregarRepartidor() {
+    if (contadorRepartidores >= MAX_REPARTIDORES) {
+        cout << "[ERROR] Limite de repartidores alcanzado.\n";
+        return;
+    }
+
+    char cedula[10], nombre[50], vehiculo[20], placa[10];
+    
+    cout << "\n--- REGISTRAR REPARTIDOR ---\n";
+    cout << "Cedula: "; cin >> cedula;
+    cin.ignore();
+    cout << "Nombre: "; cin.getline(nombre, 50);
+    cout << "Vehiculo: "; cin.getline(vehiculo, 20);
+    cout << "Placa: "; cin.getline(placa, 10);
+
+    listaRepartidores[contadorRepartidores] = Repartidor(cedula, nombre, vehiculo, placa, 0);
+    contadorRepartidores++;
+    cout << "[OK] Repartidor registrado exitosamente.\n";
+}
+
+void SistemaDelivery::agregarSector() {
+    if (contadorSectores >= MAX_SECTORES) {
+        cout << "[ERROR] Limite de sectores alcanzado.\n";
+        return;
+    }
+
+    int id;
+    char nombre[50];
+
+    cout << "\n--- REGISTRAR SECTOR ---\n";
+    cout << "ID del Sector: "; cin >> id;
+    cin.ignore();
+    cout << "Nombre del Sector: "; cin.getline(nombre, 50);
+
+    listaSectores[contadorSectores] = Sector(id, nombre);
+    contadorSectores++;
+    cout << "[OK] Sector registrado exitosamente.\n";
+}
+
 // --- BÚSQUEDAS ---
 int SistemaDelivery::buscarCliente(const char* cedula) {
     for (int i = 0; i < contadorClientes; i++) {
@@ -107,7 +168,6 @@ int SistemaDelivery::buscarRepartidorDisponibleEnSector(int sectorId) {
             return i;
         }
     }
-    // Si no hay en el mismo sector, asigna el primer disponible global
     for (int i = 0; i < contadorRepartidores; i++) {
         if (listaRepartidores[i].isDisponible()) return i;
     }
@@ -138,7 +198,7 @@ void SistemaDelivery::solicitarEnvio() {
     char cedula[10];
     int sectorDestino;
 
-    cout << "Cédula del Cliente: "; cin >> cedula;
+    cout << "Cedula del Cliente: "; cin >> cedula;
     int posCliente = buscarCliente(cedula);
     if (posCliente == -1) {
         cout << "[ERROR] Cliente no registrado.\n";
@@ -153,12 +213,11 @@ void SistemaDelivery::solicitarEnvio() {
         return;
     }
 
-    // Asignación de envío
     listaRepartidores[posRepartidor].despacharServicio();
     listaClientes[posCliente].incrementarServicios();
 
     cout << "\n========================================\n";
-    cout << "        ENVÍO ASIGNADO CON ÉXITO        \n";
+    cout << "        ENVIO ASIGNADO CON EXITO        \n";
     cout << "========================================\n";
     cout << "Cliente: " << listaClientes[posCliente].getNombre() << "\n";
     cout << "Repartidor Asignado: " << listaRepartidores[posRepartidor].getNombre() << "\n";
@@ -170,7 +229,7 @@ void SistemaDelivery::finalizarEntrega() {
     char cedula[10];
     int sectorDestino;
 
-    cout << "Cédula del Repartidor que finaliza: "; cin >> cedula;
+    cout << "Cedula del Repartidor que finaliza: "; cin >> cedula;
     int posRepartidor = buscarRepartidor(cedula);
 
     if (posRepartidor == -1) {
@@ -188,7 +247,7 @@ void SistemaDelivery::finalizarEntrega() {
 
     cout << "[OK] Entrega finalizada. El repartidor " 
          << listaRepartidores[posRepartidor].getNombre() 
-         << " ahora está DISPONIBLE en el sector " << sectorDestino << ".\n";
+         << " ahora esta DISPONIBLE en el sector " << sectorDestino << ".\n";
 }
 
 void SistemaDelivery::generarReporteEstadisticas() {
@@ -205,7 +264,7 @@ void SistemaDelivery::generarReporteEstadisticas() {
     archivo << "\n-- CLIENTES --\n";
     for (int i = 0; i < contadorClientes; i++) {
         archivo << "Nombre: " << listaClientes[i].getNombre()
-                << " | Envíos solicitados: " << listaClientes[i].getServicios() << "\n";
+                << " | Envios solicitados: " << listaClientes[i].getServicios() << "\n";
     }
 
     archivo.close();
@@ -216,20 +275,30 @@ void SistemaDelivery::generarReporteEstadisticas() {
 void SistemaDelivery::menuGestionInterna() {
     int opcion;
     do {
-        cout << "\n--- GESTIÓN INTERNA ---\n"
-             << "1. Listar Clientes\n"
-             << "2. Listar Repartidores\n"
-             << "3. Listar Sectores\n"
+        cout << "\n--- GESTION INTERNA ---\n"
+             << "1. Registrar Cliente\n"
+             << "2. Registrar Repartidor\n"
+             << "3. Registrar Sector\n"
+             << "4. Listar Clientes\n"
+             << "5. Listar Repartidores\n"
+             << "6. Listar Sectores\n"
              << "0. Volver\n"
              << "Opcion: ";
         cin >> opcion;
 
-        if (opcion == 1) {
-            for (int i = 0; i < contadorClientes; i++) listaClientes[i].mostrarInformacion();
-        } else if (opcion == 2) {
-            for (int i = 0; i < contadorRepartidores; i++) listaRepartidores[i].mostrarInformacion();
-        } else if (opcion == 3) {
-            for (int i = 0; i < contadorSectores; i++) listaSectores[i].mostrarInformacion();
+        switch (opcion) {
+            case 1: agregarCliente(); break;
+            case 2: agregarRepartidor(); break;
+            case 3: agregarSector(); break;
+            case 4:
+                for (int i = 0; i < contadorClientes; i++) listaClientes[i].mostrarInformacion();
+                break;
+            case 5:
+                for (int i = 0; i < contadorRepartidores; i++) listaRepartidores[i].mostrarInformacion();
+                break;
+            case 6:
+                for (int i = 0; i < contadorSectores; i++) listaSectores[i].mostrarInformacion();
+                break;
         }
     } while (opcion != 0);
 }

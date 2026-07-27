@@ -29,6 +29,10 @@ private:
     void guardarRepartidores();
     void guardarSectores();
 
+    void agregarCliente();
+    void agregarRepartidor();
+    void agregarSector();
+
     // Métodos auxiliares de búsqueda
     int buscarCliente(const char* cedula);
     int buscarRepartidor(const char* cedula);
