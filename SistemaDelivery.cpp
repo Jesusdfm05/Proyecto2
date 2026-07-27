@@ -183,7 +183,7 @@ void SistemaDelivery::finalizarEntrega() {
         return;
     }
 
-    cout << "ID del Sector donde completó la entrega: "; cin >> sectorDestino;
+    cout << "ID del Sector donde completo la entrega: "; cin >> sectorDestino;
     listaRepartidores[posRepartidor].finalizarEntrega(sectorDestino);
 
     cout << "[OK] Entrega finalizada. El repartidor " 
@@ -195,11 +195,11 @@ void SistemaDelivery::generarReporteEstadisticas() {
     ofstream archivo("reporte_estadisticas.txt");
     if (!archivo.is_open()) return;
 
-    archivo << "=== REPORTE DE ESTADÍSTICAS DEL SISTEMA ===\n\n";
+    archivo << "=== REPORTE DE ESTADISTICAS DEL SISTEMA ===\n\n";
     archivo << "-- REPARTIDORES --\n";
     for (int i = 0; i < contadorRepartidores; i++) {
         archivo << "Nombre: " << listaRepartidores[i].getNombre()
-                << " | Envíos: " << listaRepartidores[i].getServicios() << "\n";
+                << " | Envios: " << listaRepartidores[i].getServicios() << "\n";
     }
 
     archivo << "\n-- CLIENTES --\n";
@@ -221,7 +221,7 @@ void SistemaDelivery::menuGestionInterna() {
              << "2. Listar Repartidores\n"
              << "3. Listar Sectores\n"
              << "0. Volver\n"
-             << "Opción: ";
+             << "Opcion: ";
         cin >> opcion;
 
         if (opcion == 1) {
@@ -238,12 +238,12 @@ void SistemaDelivery::menuServicioDiario() {
     int opcion;
     do {
         cout << "\n--- SERVICIO DIARIO ---\n"
-             << "1. Iniciar Jornada (Asignación Aleatoria)\n"
-             << "2. Solicitar Envíos\n"
+             << "1. Iniciar Jornada (Asignacion Aleatoria)\n"
+             << "2. Solicitar Envios\n"
              << "3. Finalizar Entrega\n"
-             << "4. Generar Reporte de Estadísticas\n"
+             << "4. Generar Reporte de Estadisticas\n"
              << "0. Volver\n"
-             << "Opción: ";
+             << "Opcion: ";
         cin >> opcion;
 
         switch (opcion) {
@@ -259,11 +259,11 @@ void SistemaDelivery::iniciar() {
     cargarTodo();
     int opcion;
     do {
-        cout << "\n=== SPEED DELIVERY SYSTEM ===\n"
-             << "1. Gestión Interna\n"
+        cout << "\n=== SISTEMA DELIVERY ===\n"
+             << "1. Gestion Interna\n"
              << "2. Servicio Diario\n"
              << "0. Salir y Guardar\n"
-             << "Opción: ";
+             << "Opcion: ";
         cin >> opcion;
 
         if (opcion == 1) menuGestionInterna();

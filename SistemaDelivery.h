@@ -1,9 +1,9 @@
 #ifndef SISTEMADELIVERY_H
 #define SISTEMADELIVERY_H
 
-#include "Cliente.h"
-#include "Repartidor.h"
-#include "Sector.h"
+#include "cliente.h"
+#include "repartidor.h"
+#include "sector.h"
 
 const int MAX_CLIENTES = 100;
 const int MAX_REPARTIDORES = 50;
