@@ -77,10 +77,10 @@ void Repartidor::guardarEnArchivo(ofstream& archivo) const {
 }
 
 void Repartidor::mostrarInformacion() const {
-    cout << "Cédula: " << cedula 
+    cout << "Cedula: " << cedula 
          << " | Nombre: " << nombre 
-         << " | Vehículo: " << vehiculo << " (" << placa << ")"
-         << " | Sector Ubicación: " << sector 
+         << " | Vehiculo: " << vehiculo << " (" << placa << ")"
+         << " | Sector: " << sector 
          << " | Estado: " << (disponible ? "DISPONIBLE" : "EN RUTA") 
-         << " | Envíos: " << servicios << endl;
+         << " | Envios: " << servicios << endl;
 }

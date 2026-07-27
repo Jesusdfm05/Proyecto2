@@ -44,6 +44,8 @@ public:
     // Carga inicial y guardado
     void cargarTodo();
     void guardarTodo();
+    void eliminarCliente();
+    void eliminarRepartidor();
 
     // Flujo de menú y servicios
     void iniciarJornada();

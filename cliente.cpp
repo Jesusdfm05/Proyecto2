@@ -50,8 +50,8 @@ void Cliente::guardarEnArchivo(ofstream& archivo) const {
 }
 
 void Cliente::mostrarInformacion() const {
-    cout << "Cédula: " << cedula 
+    cout << "Cedula: " << cedula 
          << " | Nombre: " << nombre 
-         << " | Teléfono: " << telefono 
-         << " | Envíos solicitados: " << servicios << endl;
+         << " | Telefono: " << telefono 
+         << " | Envios solicitados: " << servicios << endl;
 }

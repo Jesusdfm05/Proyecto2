@@ -1,3 +1,4 @@
+//g++ *.cpp -o main; .\main
 #include "SistemaDelivery.h"
 #include <iostream>
 #include <fstream>
@@ -6,6 +7,13 @@
 #include <cstring>
 
 using namespace std;
+
+// Funcion auxiliar para pausar y limpiar la salida en consola
+static void pausar() {
+    cout << "\nPresione ENTER para continuar...";
+    cin.ignore();
+    cin.get();
+}
 
 SistemaDelivery::SistemaDelivery() {
     contadorClientes = 0;
@@ -86,68 +94,7 @@ void SistemaDelivery::guardarTodo() {
     guardarSectores();
 }
 
-// --- MÉTODOS DE REGISTRO (AUTÓNOMOS Y CORREGIDOS) ---
-void SistemaDelivery::agregarCliente() {
-    if (contadorClientes >= MAX_CLIENTES) {
-        cout << "[ERROR] Limite de clientes alcanzado.\n";
-        return;
-    }
-    
-    char cedula[10];
-    char telefono[15];
-    char nombre[30];
-    
-    cout << "\n--- REGISTRAR CLIENTE ---\n";
-    cout << "Cedula: "; cin >> cedula;
-    cin.ignore(); // Limpiar el buffer de entrada
-    cout << "Telefono: "; cin.getline(telefono, 15);
-    cout << "Nombre: "; cin.getline(nombre, 30);
-
-    listaClientes[contadorClientes] = Cliente(cedula, telefono, nombre);
-    contadorClientes++;
-    cout << "[OK] Cliente registrado exitosamente.\n";
-}
-
-void SistemaDelivery::agregarRepartidor() {
-    if (contadorRepartidores >= MAX_REPARTIDORES) {
-        cout << "[ERROR] Limite de repartidores alcanzado.\n";
-        return;
-    }
-
-    char cedula[10], nombre[50], vehiculo[20], placa[10];
-    
-    cout << "\n--- REGISTRAR REPARTIDOR ---\n";
-    cout << "Cedula: "; cin >> cedula;
-    cin.ignore();
-    cout << "Nombre: "; cin.getline(nombre, 50);
-    cout << "Vehiculo: "; cin.getline(vehiculo, 20);
-    cout << "Placa: "; cin.getline(placa, 10);
-
-    listaRepartidores[contadorRepartidores] = Repartidor(cedula, nombre, vehiculo, placa, 0);
-    contadorRepartidores++;
-    cout << "[OK] Repartidor registrado exitosamente.\n";
-}
-
-void SistemaDelivery::agregarSector() {
-    if (contadorSectores >= MAX_SECTORES) {
-        cout << "[ERROR] Limite de sectores alcanzado.\n";
-        return;
-    }
-
-    int id;
-    char nombre[50];
-
-    cout << "\n--- REGISTRAR SECTOR ---\n";
-    cout << "ID del Sector: "; cin >> id;
-    cin.ignore();
-    cout << "Nombre del Sector: "; cin.getline(nombre, 50);
-
-    listaSectores[contadorSectores] = Sector(id, nombre);
-    contadorSectores++;
-    cout << "[OK] Sector registrado exitosamente.\n";
-}
-
-// --- BÚSQUEDAS ---
+// --- BUSQUEDAS ---
 int SistemaDelivery::buscarCliente(const char* cedula) {
     for (int i = 0; i < contadorClientes; i++) {
         if (strcmp(listaClientes[i].getCedula(), cedula) == 0) return i;
@@ -174,10 +121,162 @@ int SistemaDelivery::buscarRepartidorDisponibleEnSector(int sectorId) {
     return -1;
 }
 
-// --- LÓGICA DE NEGOCIO Y SERVICIOS ---
+// --- METODOS DE REGISTRO CON VALIDACION DE DUPLICADOS ---
+void SistemaDelivery::agregarCliente() {
+    if (contadorClientes >= MAX_CLIENTES) {
+        cout << "[ERROR] Limite maximo de clientes alcanzado.\n";
+        pausar();
+        return;
+    }
+    
+    char cedula[10];
+    char telefono[15];
+    char nombre[30];
+    
+    cout << "\n--- REGISTRAR CLIENTE ---\n";
+    cout << "Cedula: "; cin >> cedula;
+
+    if (buscarCliente(cedula) != -1) {
+        cout << "[ERROR] Ya existe un cliente registrado con esa cedula.\n";
+        pausar();
+        return;
+    }
+
+    cin.ignore();
+    cout << "Telefono: "; cin.getline(telefono, 15);
+    cout << "Nombre: "; cin.getline(nombre, 30);
+
+    listaClientes[contadorClientes] = Cliente(cedula, telefono, nombre);
+    contadorClientes++;
+    cout << "[OK] Cliente registrado exitosamente.\n";
+    pausar();
+}
+
+void SistemaDelivery::agregarRepartidor() {
+    if (contadorRepartidores >= MAX_REPARTIDORES) {
+        cout << "[ERROR] Limite maximo de repartidores alcanzado.\n";
+        pausar();
+        return;
+    }
+
+    char cedula[10], nombre[50], vehiculo[20], placa[10];
+    
+    cout << "\n--- REGISTRAR REPARTIDOR ---\n";
+    cout << "Cedula: "; cin >> cedula;
+
+    if (buscarRepartidor(cedula) != -1) {
+        cout << "[ERROR] Ya existe un repartidor registrado con esa cedula.\n";
+        pausar();
+        return;
+    }
+
+    cin.ignore();
+    cout << "Nombre: "; cin.getline(nombre, 50);
+    cout << "Vehiculo: "; cin.getline(vehiculo, 20);
+    cout << "Placa: "; cin.getline(placa, 10);
+
+    listaRepartidores[contadorRepartidores] = Repartidor(cedula, nombre, vehiculo, placa, 0);
+    contadorRepartidores++;
+    cout << "[OK] Repartidor registrado exitosamente.\n";
+    pausar();
+}
+
+void SistemaDelivery::agregarSector() {
+    if (contadorSectores >= MAX_SECTORES) {
+        cout << "[ERROR] Limite maximo de sectores alcanzado.\n";
+        pausar();
+        return;
+    }
+
+    int id;
+    char nombre[50];
+
+    cout << "\n--- REGISTRAR SECTOR ---\n";
+    cout << "ID del Sector: "; cin >> id;
+
+    for (int i = 0; i < contadorSectores; i++) {
+        if (listaSectores[i].getId() == id) {
+            cout << "[ERROR] Ya existe un sector con ese ID.\n";
+            pausar();
+            return;
+        }
+    }
+
+    cin.ignore();
+    cout << "Nombre del Sector: "; cin.getline(nombre, 50);
+
+    listaSectores[contadorSectores] = Sector(id, nombre);
+    contadorSectores++;
+    cout << "[OK] Sector registrado exitosamente.\n";
+    pausar();
+}
+
+// --- METODOS DE ELIMINACION ---
+void SistemaDelivery::eliminarCliente() {
+    if (contadorClientes == 0) {
+        cout << "[!] No hay clientes registrados para eliminar.\n";
+        pausar();
+        return;
+    }
+
+    char cedula[10];
+    cout << "\n--- ELIMINAR CLIENTE ---\n";
+    cout << "Ingrese la cedula del cliente a eliminar: ";
+    cin >> cedula;
+
+    int pos = buscarCliente(cedula);
+    if (pos == -1) {
+        cout << "[ERROR] Cliente no encontrado.\n";
+        pausar();
+        return;
+    }
+
+    for (int i = pos; i < contadorClientes - 1; i++) {
+        listaClientes[i] = listaClientes[i + 1];
+    }
+    contadorClientes--;
+    cout << "[OK] Cliente eliminado del sistema.\n";
+    pausar();
+}
+
+void SistemaDelivery::eliminarRepartidor() {
+    if (contadorRepartidores == 0) {
+        cout << "[!] No hay repartidores registrados para eliminar.\n";
+        pausar();
+        return;
+    }
+
+    char cedula[10];
+    cout << "\n--- ELIMINAR REPARTIDOR (RENUNCIA/RETIRO) ---\n";
+    cout << "Ingrese la cedula del repartidor a eliminar: ";
+    cin >> cedula;
+
+    int pos = buscarRepartidor(cedula);
+    if (pos == -1) {
+        cout << "[ERROR] Repartidor no encontrado.\n";
+        pausar();
+        return;
+    }
+
+    if (!listaRepartidores[pos].isDisponible()) {
+        cout << "[ERROR] No se puede eliminar un repartidor que esta actualmente EN RUTA.\n";
+        pausar();
+        return;
+    }
+
+    for (int i = pos; i < contadorRepartidores - 1; i++) {
+        listaRepartidores[i] = listaRepartidores[i + 1];
+    }
+    contadorRepartidores--;
+    cout << "[OK] Repartidor eliminado del sistema.\n";
+    pausar();
+}
+
+// --- LOGICA DE NEGOCIO Y SERVICIOS ---
 void SistemaDelivery::iniciarJornada() {
     if (contadorSectores == 0 || contadorRepartidores == 0) {
-        cout << "[!] Faltan sectores o repartidores cargados.\n";
+        cout << "[!] Faltan sectores o repartidores cargados para iniciar jornada.\n";
+        pausar();
         return;
     }
     srand(time(NULL));
@@ -192,16 +291,25 @@ void SistemaDelivery::iniciarJornada() {
         );
     }
     cout << "[OK] Jornada iniciada. Repartidores distribuidos aleatoriamente.\n";
+    pausar();
 }
 
 void SistemaDelivery::solicitarEnvio() {
+    if (contadorClientes == 0 || contadorRepartidores == 0) {
+        cout << "[!] Se requieren clientes y repartidores registrados para procesar envios.\n";
+        pausar();
+        return;
+    }
+
     char cedula[10];
     int sectorDestino;
 
+    cout << "\n--- SOLICITAR ENVIO ---\n";
     cout << "Cedula del Cliente: "; cin >> cedula;
     int posCliente = buscarCliente(cedula);
     if (posCliente == -1) {
         cout << "[ERROR] Cliente no registrado.\n";
+        pausar();
         return;
     }
 
@@ -210,6 +318,7 @@ void SistemaDelivery::solicitarEnvio() {
 
     if (posRepartidor == -1) {
         cout << "[!] No hay repartidores disponibles en este momento.\n";
+        pausar();
         return;
     }
 
@@ -222,23 +331,33 @@ void SistemaDelivery::solicitarEnvio() {
     cout << "Cliente: " << listaClientes[posCliente].getNombre() << "\n";
     cout << "Repartidor Asignado: " << listaRepartidores[posRepartidor].getNombre() << "\n";
     cout << "Estado: EN RUTA\n";
-    cout << "========================================\n\n";
+    cout << "========================================\n";
+    pausar();
 }
 
 void SistemaDelivery::finalizarEntrega() {
+    if (contadorRepartidores == 0) {
+        cout << "[!] No hay repartidores registrados.\n";
+        pausar();
+        return;
+    }
+
     char cedula[10];
     int sectorDestino;
 
+    cout << "\n--- FINALIZAR ENTREGA ---\n";
     cout << "Cedula del Repartidor que finaliza: "; cin >> cedula;
     int posRepartidor = buscarRepartidor(cedula);
 
     if (posRepartidor == -1) {
         cout << "[ERROR] Repartidor no encontrado.\n";
+        pausar();
         return;
     }
 
     if (listaRepartidores[posRepartidor].isDisponible()) {
-        cout << "[!] El repartidor ya se encuentra disponible (no estaba en ruta).\n";
+        cout << "[!] El repartidor ya se encuentra disponible (no esta en ruta).\n";
+        pausar();
         return;
     }
 
@@ -248,11 +367,16 @@ void SistemaDelivery::finalizarEntrega() {
     cout << "[OK] Entrega finalizada. El repartidor " 
          << listaRepartidores[posRepartidor].getNombre() 
          << " ahora esta DISPONIBLE en el sector " << sectorDestino << ".\n";
+    pausar();
 }
 
 void SistemaDelivery::generarReporteEstadisticas() {
     ofstream archivo("reporte_estadisticas.txt");
-    if (!archivo.is_open()) return;
+    if (!archivo.is_open()) {
+        cout << "[ERROR] No se pudo crear el archivo de reporte.\n";
+        pausar();
+        return;
+    }
 
     archivo << "=== REPORTE DE ESTADISTICAS DEL SISTEMA ===\n\n";
     archivo << "-- REPARTIDORES --\n";
@@ -269,9 +393,10 @@ void SistemaDelivery::generarReporteEstadisticas() {
 
     archivo.close();
     cout << "[OK] Reporte 'reporte_estadisticas.txt' generado exitosamente.\n";
+    pausar();
 }
 
-// --- MENÚS ---
+// --- MENUS ---
 void SistemaDelivery::menuGestionInterna() {
     int opcion;
     do {
@@ -282,6 +407,8 @@ void SistemaDelivery::menuGestionInterna() {
              << "4. Listar Clientes\n"
              << "5. Listar Repartidores\n"
              << "6. Listar Sectores\n"
+             << "7. Eliminar Cliente\n"
+             << "8. Eliminar Repartidor\n"
              << "0. Volver\n"
              << "Opcion: ";
         cin >> opcion;
@@ -291,14 +418,25 @@ void SistemaDelivery::menuGestionInterna() {
             case 2: agregarRepartidor(); break;
             case 3: agregarSector(); break;
             case 4:
-                for (int i = 0; i < contadorClientes; i++) listaClientes[i].mostrarInformacion();
+                cout << "\n--- LISTA DE CLIENTES ---\n";
+                if (contadorClientes == 0) cout << "[!] No hay clientes registrados.\n";
+                else for (int i = 0; i < contadorClientes; i++) listaClientes[i].mostrarInformacion();
+                pausar();
                 break;
             case 5:
-                for (int i = 0; i < contadorRepartidores; i++) listaRepartidores[i].mostrarInformacion();
+                cout << "\n--- LISTA DE REPARTIDORES ---\n";
+                if (contadorRepartidores == 0) cout << "[!] No hay repartidores registrados.\n";
+                else for (int i = 0; i < contadorRepartidores; i++) listaRepartidores[i].mostrarInformacion();
+                pausar();
                 break;
             case 6:
-                for (int i = 0; i < contadorSectores; i++) listaSectores[i].mostrarInformacion();
+                cout << "\n--- LISTA DE SECTORES ---\n";
+                if (contadorSectores == 0) cout << "[!] No hay sectores registrados.\n";
+                else for (int i = 0; i < contadorSectores; i++) listaSectores[i].mostrarInformacion();
+                pausar();
                 break;
+            case 7: eliminarCliente(); break;
+            case 8: eliminarRepartidor(); break;
         }
     } while (opcion != 0);
 }
@@ -341,5 +479,5 @@ void SistemaDelivery::iniciar() {
     } while (opcion != 0);
 
     guardarTodo();
-    cout << "[OK] Datos guardados. ¡Hasta luego!\n";
+    cout << "[OK] Datos guardados. Hasta luego!\n";
 }
